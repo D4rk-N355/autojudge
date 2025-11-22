@@ -19,8 +19,4 @@ COPY . .
 
 EXPOSE 8080
 
-<<<<<<< HEAD
 CMD ["python", "judge.py"]
-=======
-CMD ["python", "judge.py"]
->>>>>>> 8521d065de16b653ecf07adde3347775f58343c9
