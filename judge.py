@@ -3,9 +3,12 @@ import time
 import sqlite3
 import subprocess
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+DB_FILE = "judge.db"
 
 app = Flask(__name__)
-DB_FILE = "judge.db"
+CORS(app)  # 啟用跨域，讓 GitHub Pages 前端可以呼叫 API
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)
