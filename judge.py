@@ -1,21 +1,15 @@
 import os
+import time
 import sqlite3
 import subprocess
-import time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 DB_FILE = "judge.db"
-<<<<<<< HEAD
 PROBLEM_ROOT = "problems"
 
 app = Flask(__name__)
 CORS(app)
-=======
-
-app = Flask(__name__)
-CORS(app)  # 啟用跨域，讓 GitHub Pages 前端可以呼叫 API
->>>>>>> 8521d065de16b653ecf07adde3347775f58343c9
 
 
 def init_db():
@@ -37,13 +31,8 @@ def init_db():
 
 
 def judge(source_file, problem_id):
-<<<<<<< HEAD
     problem_id = str(problem_id)
     folder = os.path.join(PROBLEM_ROOT, problem_id)
-=======
-    """Compile and run the C source; return (status, output_preview, fail_case)."""
-    problem_id = str(problem_id)
->>>>>>> 8521d065de16b653ecf07adde3347775f58343c9
     os.makedirs("submissions", exist_ok=True)
 
     exe_file = os.path.abspath(
@@ -60,15 +49,9 @@ def judge(source_file, problem_id):
 
     # run multiple testcases
     test_id = 1
-<<<<<<< HEAD
     while os.path.exists(os.path.join(folder, f"input{str(test_id).zfill(2)}.txt")):
         input_file = os.path.join(folder, f"input{str(test_id).zfill(2)}.txt")
         expected_file = os.path.join(folder, f"expected{str(test_id).zfill(2)}.txt")
-=======
-    while os.path.exists(f"problems/{problem_id}/input{test_id}.txt"):
-        input_file = f"problems/{problem_id}/input{test_id}.txt"
-        expected_file = f"problems/{problem_id}/expected{test_id}.txt"
->>>>>>> 8521d065de16b653ecf07adde3347775f58343c9
 
         start = time.time()
         try:
@@ -123,7 +106,6 @@ def submit():
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "success", "data": {"service": "ok"}}), 200
-<<<<<<< HEAD
 
 
 @app.route("/problems", methods=["GET"])
@@ -165,8 +147,6 @@ def get_problem(pid):
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-=======
->>>>>>> 8521d065de16b653ecf07adde3347775f58343c9
 
 
 if __name__ == "__main__":
@@ -174,8 +154,4 @@ if __name__ == "__main__":
     os.makedirs("submissions", exist_ok=True)
     init_db()
     port = int(os.environ.get("PORT", 8080))
-<<<<<<< HEAD
     app.run(host="0.0.0.0", port=port)
-=======
-    app.run(host="0.0.0.0", port=port)
->>>>>>> 8521d065de16b653ecf07adde3347775f58343c9
