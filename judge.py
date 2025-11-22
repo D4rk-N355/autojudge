@@ -29,7 +29,6 @@ def init_db():
 
 
 def judge(source_file, problem_id):
-    """Compile and run the C source; return (status, output_preview)."""
     problem_id = str(problem_id)
     os.makedirs("submissions", exist_ok=True)
 
@@ -129,28 +128,30 @@ def submit():
         problem_id = request.form.get("problem_id")
         source_code = request.files["file"]
 
-        os.makedirs("submissions", exist_ok=True)
         source_path = f"submissions/{problem_id}.c"
         source_code.save(source_path)
 
         result, preview = judge(source_path, problem_id)
         return jsonify({
-            "problem_id": problem_id,
-            "result": result,
-            "output_preview": preview
+            "status": "success",
+            "data": {
+                "problem_id": problem_id,
+                "result": result,
+                "output_preview": preview
+            }
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok"}), 200
+    return jsonify({"status": "success", "data": {"service": "ok"}}), 200
 
 
 if __name__ == "__main__":
     os.makedirs("problems", exist_ok=True)
     os.makedirs("submissions", exist_ok=True)
     init_db()
-    port = int(os.environ.get("PORT", 8080))  # 改成讀取環境變數
+    port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
