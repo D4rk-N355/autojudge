@@ -1,0 +1,2 @@
+Row totals: 30 25 30 25 30
+Column totals: 8 18 28 38 48

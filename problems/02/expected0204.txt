@@ -1,0 +1,2 @@
+Row totals: 25 20 15 10 5
+Column totals: 15 15 15 15 15

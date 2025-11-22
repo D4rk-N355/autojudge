@@ -1,0 +1,2 @@
+Row totals: 50 100 25 5 0
+Column totals: 36 36 36 36 36
