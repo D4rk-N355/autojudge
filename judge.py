@@ -10,6 +10,7 @@ DB_FILE = "judge.db"
 app = Flask(__name__)
 CORS(app)  # 啟用跨域，讓 GitHub Pages 前端可以呼叫 API
 
+
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
@@ -26,16 +27,15 @@ def init_db():
     conn.commit()
     conn.close()
 
-def judge(source_file, problem_id):
-    """Compile and run the C source; return (status, output_preview).
 
-    status: one of CE, TLE, RE, WA, AC
-    output_preview: first 200 chars of program output (or error message)
-    """
+def judge(source_file, problem_id):
+    """Compile and run the C source; return (status, output_preview)."""
     problem_id = str(problem_id)
-    # paths
     os.makedirs("submissions", exist_ok=True)
-    exe_file = os.path.abspath(f"submissions/{problem_id}.exe" if os.name == "nt" else f"submissions/{problem_id}.out")
+
+    exe_file = os.path.abspath(
+        f"submissions/{problem_id}.exe" if os.name == "nt" else f"submissions/{problem_id}.out"
+    )
     output_file = os.path.abspath(f"submissions/{problem_id}.out.txt")
     input_file = os.path.abspath(f"problems/{problem_id}/input.txt")
     expected_file1 = os.path.abspath(f"problems/{problem_id}/expected.txt")
@@ -94,7 +94,9 @@ def judge(source_file, problem_id):
     except FileNotFoundError:
         output_data = ""
 
-    expected_path = expected_file1 if os.path.exists(expected_file1) else (expected_file2 if os.path.exists(expected_file2) else None)
+    expected_path = expected_file1 if os.path.exists(expected_file1) else (
+        expected_file2 if os.path.exists(expected_file2) else None
+    )
     if expected_path is None:
         status = "RE"
         message = "Expected output file not found"
@@ -108,7 +110,7 @@ def judge(source_file, problem_id):
         with open(expected_path, "r", encoding="utf-8") as f2:
             expected_data = f2.read().strip()
         status = "AC" if output_data == expected_data else "WA"
-    except Exception as e:
+    except Exception:
         status = "RE"
         output_data = ""
 
@@ -120,26 +122,35 @@ def judge(source_file, problem_id):
     conn.close()
     return status, preview
 
+
 @app.route("/submit", methods=["POST"])
 def submit():
-    problem_id = request.form.get("problem_id")
-    source_code = request.files["file"]
+    try:
+        problem_id = request.form.get("problem_id")
+        source_code = request.files["file"]
 
-    # 存檔
-    os.makedirs("submissions", exist_ok=True)
-    source_path = f"submissions/{problem_id}.c"
-    source_code.save(source_path)
+        os.makedirs("submissions", exist_ok=True)
+        source_path = f"submissions/{problem_id}.c"
+        source_code.save(source_path)
 
-    # 判題
-    result, preview = judge(source_path, problem_id)
-    return jsonify({
-        "problem_id": problem_id,
-        "result": result,
-        "output_preview": preview
-    })
+        result, preview = judge(source_path, problem_id)
+        return jsonify({
+            "problem_id": problem_id,
+            "result": result,
+            "output_preview": preview
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"}), 200
+
 
 if __name__ == "__main__":
     os.makedirs("problems", exist_ok=True)
     os.makedirs("submissions", exist_ok=True)
     init_db()
-    app.run(host="0.0.0.0", port=8080)
+    port = int(os.environ.get("PORT", 8080))  # 改成讀取環境變數
+    app.run(host="0.0.0.0", port=port)
